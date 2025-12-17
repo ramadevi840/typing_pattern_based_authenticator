@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='keystroke.js') }}"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Register</h2>
+    <p>Type your password <strong>3 times</strong> for better authentication.</p>
+    <p id="attempt-counter">Attempt 1 of 3</p>
+
+    <form id="registerForm" method="POST" action="/register" onsubmit="return prepareMultipleKeystrokes()">
+      <label>Username</label><br>
+      <input type="text" name="username" required><br><br>
+
+      <label>Password</label><br>
+      <input type="password" id="password" name="password" data-keystroke="true" required><br><br>
+
+      <input type="hidden" id="all_timings" name="all_timings" value="[]">
+
+      <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="/">Login</a></p>
+  </div>
+
+  <script>
+const TOTAL_ATTEMPTS = 3;
+let currentAttempt = 1;
+let attemptsData = [];
+
+const counterEl = document.getElementById('attempt-counter');
+const passwordEl = document.getElementById('password');
+
+function prepareMultipleKeystrokes() {
+  const captured = window._getCapturedKeystrokes();
+  if (captured.length === 0) {
+    alert("Please type your password to capture keystrokes.");
+    return false;
+  }
+
+  attemptsData.push(captured);
+  window.resetKeystrokes();
+
+  if (currentAttempt < TOTAL_ATTEMPTS) {
+    currentAttempt++;
+    counterEl.textContent = `Attempt ${currentAttempt} of ${TOTAL_ATTEMPTS}`;
+    
+    // Clear password field for next attempt
+    passwordEl.value = "";
+    passwordEl.focus();
+
+    return false; // block submission until all attempts done
+  }
+
+  // All attempts done, submit
+  document.getElementById('all_timings').value = JSON.stringify(attemptsData);
+  return true; // allow form submission
+}
+</script>
+
+</body>
+</html>
+

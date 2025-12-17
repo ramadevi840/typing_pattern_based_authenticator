@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='keystroke.js') }}"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+
+    <form id="loginForm" method="POST" action="/login" onsubmit="return prepareKeystrokesForSubmit()">
+      <label>Username</label><br>
+      <input type="text" name="username" required><br><br>
+
+      <label>Password</label><br>
+      <input type="password" id="password" name="password" data-keystroke="true" required><br><br>
+
+      <input type="hidden" id="timings" name="timings" value="[]">
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p id="feedback" style="color:#ff5555; font-weight:bold; margin-top:10px;"></p>
+    <p>New user? <a href="/register">Register here</a></p>
+  </div>
+
+  <script>
+    const feedbackEl = document.getElementById('feedback');
+
+    window.prepareKeystrokesForSubmit = function () {
+      const captured = window._getCapturedKeystrokes();
+      if (captured.length === 0) {
+        feedbackEl.textContent = "Please type your password to capture keystrokes.";
+        return false;
+      }
+      document.getElementById('timings').value = JSON.stringify(captured);
+      feedbackEl.textContent = "Keystrokes captured. Submitting...";
+      return true; // allow form submission
+    };
+  </script>
+</body>
+</html>
